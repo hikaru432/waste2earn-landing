@@ -36,6 +36,13 @@ const Home: NextPage<BlogProps> = ({ allPostsData, activeProposals }) => {
   
   window.open(loginUrl, "_blank");
 };
+
+const handleLogin2 = () => {
+  const loginUrl = "/";
+  
+  window.open(loginUrl, "_blank");
+};
+
   return (
     <>
       <NextSeo
@@ -86,8 +93,8 @@ const Home: NextPage<BlogProps> = ({ allPostsData, activeProposals }) => {
               </div>
             </div>
           ) : null}
-          <h1 className="md:text-5xl text-3xl md:leading-[3.5rem]">
-          Waste Revalued. Future Rewarded.
+          <h1 className="md:text-5xl text-3xl md:leading-[3.5rem] md:text-center">
+          Waste Revalued
           </h1>
           <div className="space-y-2">
             <div onClick={handleLogin}>
@@ -98,11 +105,19 @@ const Home: NextPage<BlogProps> = ({ allPostsData, activeProposals }) => {
                 Open/Create Wallet 
               </Button>
             </div>
+            <div onClick={handleLogin2}>
+              <Button
+                primary
+                desc={<span className="text-white text-2xl system md:block hidden">&rarr;</span>}
+                icon="/assets/icon/snapshot.svg">
+                Wastopia Game 
+              </Button>
+            </div>
             <div className="md:flex md:flex-row md:space-y-0 space-y-2 md:space-x-2 items-stretch text-black">
               <div className="flex-1">
                 <Link href="/blog/waste-token">
                   <Button className="align-flex-start" icon={<></>}>
-                    Waste2Earn $Waste Token Launching
+                    Buy $Waste Token 
                   </Button>
                 </Link>
               </div>
@@ -193,7 +208,7 @@ const Home: NextPage<BlogProps> = ({ allPostsData, activeProposals }) => {
             <Button
               target="_blank"
               rel="noreferrer"
-              href="https://snapshot.org/#/beanstalkdao.eth"
+              href="https://snapshot.org/#/waste2earn.eth"
               icon="/assets/icon/snapshot.svg"
               desc="Vote on governance proposals">
               Reverion
