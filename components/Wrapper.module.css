@@ -1,0 +1,28 @@
+.TextContainer {
+  @apply min-h-screen flex flex-col items-center w-full;
+  @apply xl:px-[150px] lg:px-[50px] px-[25px] sm:py-[50px] py-[25px];
+}
+
+.FarmImage {
+  @apply h-screen lg:block hidden;
+  position: sticky;
+  top: 0;
+  right: 0;
+
+  /* Image positioning */
+  width: 900px;
+  background-repeat: no-repeat;
+  background-size: auto 120%;
+  background-position-y: bottom;
+  background-position-x: right;
+}
+.videoElement {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -1;
+}
+

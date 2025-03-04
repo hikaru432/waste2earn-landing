@@ -1,0 +1,9 @@
+# *
+User-agent: *
+Allow: /
+
+# Host
+Host: https://waste2earn.xyz
+
+# Sitemaps
+Sitemap: https://waste2earn.xyz/sitemap.xml
