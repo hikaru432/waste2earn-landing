@@ -49,7 +49,7 @@ const Wrapper : FC<WrapperProps> = ({
                 Blog
               </a>
             </Link>
-            <a href="https://nns.ic0.app" target="_blank" rel="noreferrer" className="inline-block border border-gray-200 rounded-md px-4 py-2 text-md">
+            <a href="https://hm7ne-saaaa-aaaao-qezaq-cai.icp0.io/" target="_blank" rel="noreferrer" className="inline-block border border-gray-200 rounded-md px-4 py-2 text-md">
               Launch App
             </a>
           </div>

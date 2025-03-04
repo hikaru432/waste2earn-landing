@@ -5,6 +5,7 @@ const Button : FC<{
   rel?: string,
   href?: string,
   primary?: boolean,
+  secondary?: boolean,
   icon?: string | ReactElement,
   desc?: string | ReactElement,
   iconStyle?: any,
@@ -12,6 +13,7 @@ const Button : FC<{
 }> = ({
   children,
   primary = false,
+  secondary = false,
   icon = undefined,
   desc = undefined,
   ...props
@@ -25,9 +27,12 @@ const Button : FC<{
     ${icon
       ? 'sm:flex sm:flex-row items-center text-left sm:space-x-4 block'
       : 'block text-center'}
-    ${primary
-      ? `bg-[#3EB94E] text-white`
-      : `bg-white hover:border-[#C1DEF2] border border-[#C1DEF2]`}
+      ${primary 
+        ? 'bg-[#3EB94E] text-white'
+        : secondary
+          ? 'bg-[#f76805] text-white'
+          : 'bg-white hover:border-[#C1DEF2] border border-[#C1DEF2]'
+      }
   `}>
     {typeof icon === 'string' && <img src={icon} className="sm:h-10 sm:w-10 w-8 h-8 p-1" style={props.iconStyle} />}
     <span className="">{children}</span>

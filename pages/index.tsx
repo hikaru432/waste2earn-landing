@@ -107,9 +107,9 @@ const handleLogin2 = () => {
             </div>
             <div onClick={handleLogin2}>
               <Button
-                primary
+                secondary
                 desc={<span className="text-white text-2xl system md:block hidden">&rarr;</span>}
-                icon="/assets/icon/snapshot.svg">
+                icon="/assets/icon/wasticon.svg">
                 Wastopia Game 
               </Button>
             </div>
