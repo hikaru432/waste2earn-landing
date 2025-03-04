@@ -152,8 +152,8 @@ const Home: NextPage<BlogProps> = ({ allPostsData, activeProposals }) => {
             <Button
               target="_blank"
               rel="noreferrer"
-              href="https://discord.gg/vZXS95Av"
-              icon="/assets/icon/discord.png"
+              href="https://t.me/Waste2Earn"
+              icon="/assets/icon/telegram.png"
               desc="Join the community">
               Telegram
             </Button>

@@ -2,4 +2,4 @@
   environment = { NEXT_PUBLIC_SITE_URL = "https://waste2earn.xyz" }
 
 [context.branch-deploy.environment]
-  NEXT_PUBLIC_SITE_URL = "https://dev.waste2earn.xyz"
+  NEXT_PUBLIC_SITE_URL = "https://waste2earn.xyz"
