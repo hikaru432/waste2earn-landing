@@ -1,0 +1,16 @@
+/* Keyframes for walking emoji */
+@keyframes walk {
+    0% { content: '\1F6B6'; } /* Person walking */
+    25% { content: '\1F6B7'; } /* Person running */
+    50% { content: '\1F6B8'; } /* Person walking */
+    75% { content: '\1F6B9'; } /* Person running */
+    100% { content: '\1F6B6'; } /* Person walking */
+  }
+  
+  /* Hover effect on button */
+  .hover-walk:hover::after {
+    content: '\1F6B6'; /* Start with walking emoji */
+    animation: walk 0.5s steps(4) infinite;
+    font-size: 2em; /* Adjust size as needed */
+    margin-left: 10px; /* Space between text and emoji */
+  }

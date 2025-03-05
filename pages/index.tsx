@@ -1,7 +1,7 @@
 import type { GetStaticPropsResult, NextPage } from 'next'
 import Link from 'next/link';
 import { NextSeo } from 'next-seo';
-
+// import '../styles/style.css';
 import Button from '../components/Buttons/Button';
 import PostButton from '../components/Buttons/PostButton';
 import Wrapper from '../components/Wrapper';
@@ -108,9 +108,10 @@ const handleLogin2 = () => {
             <div onClick={handleLogin2}>
               <Button
                 secondary
+                // className="hover-walk"
                 desc={<span className="text-white text-2xl system md:block hidden">&rarr;</span>}
                 icon="/assets/icon/wasticon.svg">
-                Wastopia Game 
+                Was2pia CoreGame 
               </Button>
             </div>
             <div className="md:flex md:flex-row md:space-y-0 space-y-2 md:space-x-2 items-stretch text-black">
@@ -171,6 +172,14 @@ const handleLogin2 = () => {
               icon="/assets/icon/telegram.png"
               desc="Join the community">
               Telegram
+            </Button>
+            <Button
+              target="_blank"
+              rel="noreferrer"
+              href="https://t.me/Waste2Earn"
+              icon="/assets/icon/X-logo.png"
+              desc="Join the community">
+              Twitter
             </Button>
             {/* <iframe width="100%" height="315" src="https://www.youtube.com/embed/D0zQSNMXbiM" title="YouTube video player" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe> */}
           </div>
