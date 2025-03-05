@@ -1,6 +1,6 @@
 import { NextPage } from "next";
 import { NextSeo } from "next-seo";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Wrapper from "../../components/Wrapper";
 import { getSortedPostsData } from '../../lib/posts'
 import { PostData } from '../../lib/posts'
