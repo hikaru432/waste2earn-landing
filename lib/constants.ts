@@ -3,7 +3,7 @@ export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://waste2earn.
 export const COPY = {
   // SITE_NAME: `Waste2Earn`,
   BASIC_TAGLINE: `Decentralized Application for Waste Management`,
-  BASIC_DESCRIPTION: `Waste2Earn is a permissionless fiat stablecoin protocol built on Internet Computer that uses token instead of collateral to issue its native stablecoin.`,
+  BASIC_DESCRIPTION: `Waste2Earn is built on Internet Computer that uses Waste token under ICRC-1 standard.`,
 }
 
 export const IMAGES = {
