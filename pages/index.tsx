@@ -8,6 +8,7 @@ import Wrapper from '../components/Wrapper';
 import {getSortedPostsData, PostData} from "../lib/posts";
 import { COPY, IMAGES, SITE_URL } from '../lib/constants';
 import {loadActiveProposals, Proposal} from '../lib/snapshot';
+// import '../styles/logo.css'
 
 type BlogProps = {
   allPostsData: PostData[];
@@ -240,6 +241,16 @@ const handleLogin2 = () => {
           <p>{`Subscribe to Waste2Earn and we'll send major Waste2Earn updates straight to your inbox.`}</p>
           <iframe src="https://waste2earn.substack.com/embed" width="100%" frameBorder="0" scrolling="no"></iframe>
         </div>
+
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <img src="./assets/community/austin.png" width="30px" height="30px" alt="/" className="w-full h-auto rounded-lg shadow-lg" />
+            <img src=".assets/community/bean-merchant.png" width="30px" height="30px" alt="/" className="w-full h-auto rounded-lg shadow-lg" />
+            <img src=".assets/community/drparth.jpg" width="30px" alt="/" height="30px" className="w-full h-auto rounded-lg shadow-lg" />
+            <img src="./assets/community/nasjaq.jpg" width="30px" alt="/" height="30px" className="w-full h-auto rounded-lg shadow-lg" />
+          </div>
+        </div>
+
       </Wrapper>
     </>
   )
