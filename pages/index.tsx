@@ -1,4 +1,5 @@
-import type { GetStaticPropsResult, NextPage } from 'next'
+import React, { useState } from 'react';
+import type { GetStaticPropsResult, NextPage } from 'next';
 import Link from 'next/link';
 import { NextSeo } from 'next-seo';
 // import '../styles/style.css';
@@ -36,6 +37,24 @@ const Home: NextPage<BlogProps> = ({ allPostsData, activeProposals }) => {
   
   window.open(loginUrl, "_blank");
 };
+
+const [showSignUp, setShowSignUp] = useState(false);
+const show = () => setShowSignUp(true)
+
+const overlayStyle: React.CSSProperties = {
+  position: "fixed",
+  top: 0,
+  left: 0,
+  width: "100%",
+  height: "100%",
+  background: showSignUp ? "rgba(0, 0, 0, 0.6)" : "rgba(0, 0, 0, 0)",
+  zIndex: 500,
+  opacity: showSignUp ? 1 : 0,
+  pointerEvents: showSignUp ? "auto" : "none",
+  backdropFilter: showSignUp ? "blur(5px)" : "blur(0)",
+  transition: "all 0.3s ease"
+};
+
 
 const handleLogin2 = () => {
   const loginUrl = "/";
@@ -93,6 +112,9 @@ const handleLogin2 = () => {
               </div>
             </div>
           ) : null}
+
+        <div style={overlayStyle}></div>
+
           <h1 className="md:text-5xl text-3xl md:leading-[3.5rem] md:text-center">
           Waste Revalued
           </h1>
@@ -112,6 +134,15 @@ const handleLogin2 = () => {
                 desc={<span className="text-white text-2xl system md:block hidden">&rarr;</span>}
                 icon="/assets/icon/wasticon.svg">
                 Was2pia CoreGame 
+              </Button>
+            </div>
+            <div onClick={show}>
+              <Button
+                tertiary
+                // className="hover-walk"
+                desc={<span className="text-white text-2xl system md:block hidden">&rarr;</span>}
+                icon="/assets/icon/create.png">
+                Sign Up
               </Button>
             </div>
             <div className="md:flex md:flex-row md:space-y-0 space-y-2 md:space-x-2 items-stretch text-black">
