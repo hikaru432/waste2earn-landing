@@ -242,6 +242,7 @@ const handleLogin2 = () => {
           <iframe src="https://waste2earn.substack.com/embed" width="100%" frameBorder="0" scrolling="no"></iframe>
         </div>
         
+        {/* Partners */}
         <div className="space-y-4 p-[16px] rounded-lg">
             <h2 className="text-3xl font-normal text-start">Partners</h2>
             <div className="flex justify-center mt-[50px]">
