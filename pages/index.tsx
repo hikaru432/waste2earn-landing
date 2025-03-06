@@ -40,6 +40,7 @@ const Home: NextPage<BlogProps> = ({ allPostsData, activeProposals }) => {
 
 const [showSignUp, setShowSignUp] = useState(false);
 const show = () => setShowSignUp(true)
+const hide = () => setShowSignUp(false)
 
 const overlayStyle: React.CSSProperties = {
   position: "fixed",
@@ -55,6 +56,18 @@ const overlayStyle: React.CSSProperties = {
   transition: "all 0.3s ease"
 };
 
+const signupForm: React.CSSProperties = {
+  position: "fixed",
+  top: 0,
+  left: 0,
+  width: "100%",
+  height: "100%",
+  zIndex: 600,
+  opacity: showSignUp ? 1 : 0,
+  visibility: showSignUp ? "visible" : "hidden",
+  pointerEvents: showSignUp ? "auto" : "none",
+  transition: "all 0.3s ease"
+};
 
 const handleLogin2 = () => {
   const loginUrl = "/";
@@ -114,6 +127,25 @@ const handleLogin2 = () => {
           ) : null}
 
         <div style={overlayStyle}></div>
+
+        <div style={signupForm}>
+
+          <div className="flex items-center justify-center min-h-screen transition-all duration-300 ease-in-out">
+            <form className="relative w-[320px] md:w-[420px] bg-[#dbd9d9] p-6 rounded-lg shadow-md">
+
+              <div className="absolute flex items-center justify-center bg-[#e85151] top-3 right-3 text-white-500 rounded-lg shadow-md hover:bg-[#bf3737] text-4xl font-light cursor-pointer w-8 h-8 transition-all duration-300 ease-in-out" onClick={hide}>&times;</div>
+              <h2 className="text-3xl mb-6 text-zinc-600 text-center">Sign Up on Waste2Earn</h2>
+              
+              <input type="text" name="firstName" placeholder="First Name" className="w-full font-extralight text-neutral-600 text-lg p-2 mb-5 border rounded" required />
+              <input type="text" name="lastName" placeholder="Last Name" className="w-full font-extralight text-neutral-600 text-lg p-2 mb-5 border rounded" required />
+              <input type="email" name="email" placeholder="Email" className="w-full font-extralight text-neutral-600 text-lg p-2 mb-5 border rounded" required />
+              <input type="password" name="password" placeholder="Password" className="w-full font-extralight text-neutral-600 text-lg p-2 mb-5 border rounded" required />
+              <input type="password" name="confirmPassword" placeholder="Confirm Password" className="w-full font-extralight text-neutral-600 text-lg p-2 mb-5 border rounded" required />
+              <button type="submit" className="w-full bg-[#067ac7] mb-8 text-white text-2xl p-2 rounded hover:bg-[#015891] transition-all duration-300 ease-in-out">Sign Up</button>
+            </form>
+          </div>
+
+        </div>
 
           <h1 className="md:text-5xl text-3xl md:leading-[3.5rem] md:text-center">
           Waste Revalued
