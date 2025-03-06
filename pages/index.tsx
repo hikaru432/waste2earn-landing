@@ -43,10 +43,12 @@ const show = () => setShowSignUp(true)
 const hide = () => setShowSignUp(false)
 
 const [formData, setFormData] = useState({ firstname: '', lastname: '', email: '', password: '', confirmpass: ''})
-const [errors, setErrors] = useState({ firstname: '', lastname: '', email: '', password: '', confirmpass: '' })
+const [errors, setErrors] = useState({ firstname: '', lastname: '', email: '', password: '', confirmpass: '', signupForm: '' })
 
 const [isSignupFormDefault, setIsSignupFormDefault] = useState(false)
 const [signupFormError, setSignupFormError] = useState(false)
+const [signupSuccess, setSignupSuccess] = useState(false)
+const [isSigningUp, setIsSigningUp] = useState(false)
 
 const validateFirstname = (firstname) => {
   if (!firstname.trim()) return ''
@@ -139,7 +141,7 @@ const handleSignupInputChange = (field, value) => {
 
 useEffect(() => {
 
-  if (!isSignupFormDefault) 
+  if (!isSignupFormDefault || signupSuccess) 
   return
 
   const isSignupFormEmpty =
@@ -166,7 +168,46 @@ useEffect(() => {
       ...prev, signupForm: signupFormError
   }))
 
-}, [formData, isSignupFormDefault])
+}, [formData, isSignupFormDefault, signupSuccess])
+
+const handleSignupSubmit = async (e) => {
+
+  e.preventDefault()
+
+  const isSignupFormEmpty =
+      !(formData.firstname?.trim()) ||
+      !(formData.lastname?.trim()) ||
+      !(formData.email?.trim()) ||
+      !(formData.password?.trim()) ||
+      !(formData.confirmpass?.trim())
+
+  const hasSignupErrors =
+      errors.firstname ||
+      errors.lastname ||
+      errors.email ||
+      errors.password ||
+      errors.confirmpass
+
+  const signupFormError = isSignupFormEmpty
+      ? 'There are empty fields, please adjust them properly.'
+      : hasSignupErrors
+      ? 'There are incorrect fields, please adjust them properly.'
+      : ''
+
+  setErrors((prev) => ({ ...prev, signupForm: signupFormError }))
+      if (signupFormError) {
+      setSignupSuccess('')
+      return
+  }
+
+  if (!signupFormError) {
+
+      setIsSigningUp(true)
+
+      
+  }
+
+}
 
 const overlayStyle: React.CSSProperties = {
   position: "fixed",
@@ -259,7 +300,7 @@ const handleLogin2 = () => {
 
           <div className="flex items-center justify-center min-h-screen transition-all duration-300 ease-in-out">
 
-            <form className="relative w-[320px] md:w-[420px] bg-[#dbd9d9] p-6 rounded-lg shadow-md">
+            <form className="relative w-[320px] md:w-[420px] bg-[#dbd9d9] p-6 rounded-lg shadow-md"  onSubmit={handleSignupSubmit} noValidate>
 
               <div className="absolute flex items-center justify-center bg-[#e85151] top-3 right-3 text-white-500 rounded-lg shadow-md hover:bg-[#bf3737] text-4xl font-light cursor-pointer w-8 h-8 transition-all duration-300 ease-in-out" onClick={hide}>&times;</div>
               <h2 className="text-3xl mb-6 text-zinc-600 text-center">Sign Up on Waste2Earn</h2>
@@ -284,6 +325,9 @@ const handleLogin2 = () => {
               <input type="password" name="confirmpass" 
               value={formData.confirmpass ?? ''} onChange={(e) => handleSignupInputChange('confirmpass', e.target.value)} placeholder="Confirm Password" className="w-full font-extralight text-neutral-600 text-lg p-2 mb-5 border rounded" />
               
+
+              {signupSuccess && (<span><p className="text-red-700">{signupSuccess}</p></span>)}
+              {errors.signupForm && (<span><p className="text-red-700">{errors.signupForm}</p></span>)}
               <button type="submit" className="w-full bg-[#067ac7] mb-6 text-white text-2xl p-2 rounded hover:bg-[#015891] transition-all duration-300 ease-in-out">Sign Up</button>
             
             </form>
