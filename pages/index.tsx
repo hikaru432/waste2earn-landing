@@ -38,7 +38,7 @@ const Home: NextPage<BlogProps> = ({ allPostsData, activeProposals }) => {
   window.open(loginUrl, "_blank");
 };
 
-const [showSignUp, setShowSignUp] = useState(false);
+const [showSignUp, setShowSignUp] = useState(false)
 const show = () => setShowSignUp(true)
 const hide = () => setShowSignUp(false)
 
@@ -53,6 +53,7 @@ const overlayStyle: React.CSSProperties = {
   opacity: showSignUp ? 1 : 0,
   pointerEvents: showSignUp ? "auto" : "none",
   backdropFilter: showSignUp ? "blur(5px)" : "blur(0)",
+  overflow: showSignUp ? "clip" : "auto",
   transition: "all 0.3s ease"
 };
 
@@ -131,6 +132,7 @@ const handleLogin2 = () => {
         <div style={signupForm}>
 
           <div className="flex items-center justify-center min-h-screen transition-all duration-300 ease-in-out">
+
             <form className="relative w-[320px] md:w-[420px] bg-[#dbd9d9] p-6 rounded-lg shadow-md">
 
               <div className="absolute flex items-center justify-center bg-[#e85151] top-3 right-3 text-white-500 rounded-lg shadow-md hover:bg-[#bf3737] text-4xl font-light cursor-pointer w-8 h-8 transition-all duration-300 ease-in-out" onClick={hide}>&times;</div>
@@ -141,8 +143,10 @@ const handleLogin2 = () => {
               <input type="email" name="email" placeholder="Email" className="w-full font-extralight text-neutral-600 text-lg p-2 mb-5 border rounded" required />
               <input type="password" name="password" placeholder="Password" className="w-full font-extralight text-neutral-600 text-lg p-2 mb-5 border rounded" required />
               <input type="password" name="confirmPassword" placeholder="Confirm Password" className="w-full font-extralight text-neutral-600 text-lg p-2 mb-5 border rounded" required />
-              <button type="submit" className="w-full bg-[#067ac7] mb-8 text-white text-2xl p-2 rounded hover:bg-[#015891] transition-all duration-300 ease-in-out">Sign Up</button>
+              <button type="submit" className="w-full bg-[#067ac7] mb-6 text-white text-2xl p-2 rounded hover:bg-[#015891] transition-all duration-300 ease-in-out">Sign Up</button>
+            
             </form>
+
           </div>
 
         </div>
