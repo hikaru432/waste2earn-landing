@@ -234,23 +234,44 @@ const handleLogin2 = () => {
           </div>
         </div>
         {/**
-          * Section: Subscribe
+          * Section: Subscribee
           */}
         <div className="space-y-4">
           <h2 className="text-3xl mb-6 font-normal">Subscribe</h2>
           <p>{`Subscribe to Waste2Earn and we'll send major Waste2Earn updates straight to your inbox.`}</p>
           <iframe src="https://waste2earn.substack.com/embed" width="100%" frameBorder="0" scrolling="no"></iframe>
         </div>
-
-        <div className="space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            <img src="./assets/community/austin.png" width="30px" height="30px" alt="/" className="w-full h-auto rounded-[4px] shadow-lg" />
-            <img src=".assets/community/bean-merchant.png" width="30px" height="30px" alt="/" className="w-full rounded-[4px] h-auto shadow-lg" />
-            <img src=".assets/community/drparth.jpg" width="30px" alt="/" height="30px" className="w-full h-auto rounded-[4px] shadow-lg" />
-            <img src="./assets/community/nasjaq.jpg" width="30px" alt="/" height="30px" className="w-full h-auto  rounded-[4px] shadow-lg" />
+        
+        {/* Partners */}
+        <div className="space-y-4 p-[16px] rounded-lg">
+            <h2 className="text-3xl font-normal text-start">Partners</h2>
+            <div className="flex justify-center mt-[50px]">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8 lg:gap-10">
+                <div className="w-[150px] h-[150px] overflow-hidden rounded-[100px] shadow-lg shadow-gray-200 flex justify-center items-center">
+                  <a href="https://v3.tailwindcss.com/docs/text-color" target="_blank" rel="Logo numeber 1">
+                    <img src="./Picture/Pict1.jpg" alt="Picture 1" className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"/>
+                  </a>
+                </div>
+                <div className="w-[150px] h-[150px] overflow-hidden rounded-[100px] shadow-lg shadow-gray-200 flex justify-center items-center">
+                  <a href="/" target="_blank" rel="Logo number 2">
+                    <img src="./Picture/Pict2.jpg" alt="Picture 2" 
+                      className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"/>
+                  </a>
+                </div>
+                <div className="w-[150px] h-[150px] overflow-hidden rounded-[100px] shadow-lg shadow-gray-200 flex justify-center items-center">
+                  <a href="/" target="_blank" rel="Logo number 3">
+                    <img src="./Picture/Pict3.jpg" alt="Picture 3" className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"/>
+                  </a>
+                </div>
+                <div className="w-[150px] h-[150px] overflow-hidden rounded-[100px] shadow-lg shadow-gray-200 flex justify-center items-center">
+                  <a href="/" target="_blank" rel="Logo number 4">
+                    <img src="./Picture/Pict4.jpg" alt="Picture 4" className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"/>
+                  </a>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-
+        
       </Wrapper>
     </>
   )
