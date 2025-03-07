@@ -108,7 +108,7 @@ const handleGoogleSignUp = async () => {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: `${window.location.origin}`,
       },
     })
 
@@ -269,7 +269,7 @@ const handleLogin2 = () => {
               <input type="email" name="email" 
               value={formData.email ?? ''} onChange={(e) => handleSignupInputChange('email', e.target.value)} placeholder="Email" className="w-full font-extralight text-neutral-600 text-lg p-2 mb-5 border rounded" />
 
-              <div onClick={handleGoogleSignUp} className="w-full h=[40px] flex items-center justify-center bg-[#04588f] mb-6 text-white text-1xl p-2 rounded cursor-pointer hover:bg-[#015891] transition-all duration-300 ease-in-out">
+              <div onClick={handleGoogleSignUp} className="w-full h=[40px] flex items-center justify-center bg-[#04588f] mb-6 text-white text-1xl p-2 rounded cursor-pointer hover:bg-[#003354] transition-all duration-300 ease-in-out">
                   <img className="absolute w-6 h-6 left-10" src="https://www.svgrepo.com/show/475656/google-color.svg" loading="lazy" alt="google logo" />
                   <span> {isGoogleSigningUp ? ('Authenticating') : ('Sign Up with Google')}</span>
               </div>
