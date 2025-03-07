@@ -9,6 +9,7 @@ import Wrapper from '../components/Wrapper';
 import {getSortedPostsData, PostData} from "../lib/posts";
 import { COPY, IMAGES, SITE_URL } from '../lib/constants';
 import {loadActiveProposals, Proposal} from '../lib/snapshot';
+import supabase from '../supabase/supabase';
 
 type BlogProps = {
   allPostsData: PostData[];
@@ -42,31 +43,14 @@ const [showSignUp, setShowSignUp] = useState(false)
 const show = () => setShowSignUp(true)
 const hide = () => setShowSignUp(false)
 
-const [formData, setFormData] = useState({ firstname: '', lastname: '', email: '', password: '', confirmpass: ''})
-const [errors, setErrors] = useState({ firstname: '', lastname: '', email: '', password: '', confirmpass: '', signupForm: '' })
+const [formData, setFormData] = useState({ email: '' })
+const [errors, setErrors] = useState({ email: '', signupForm: '' })
 
 const [isSignupFormDefault, setIsSignupFormDefault] = useState(false)
 const [signupFormError, setSignupFormError] = useState(false)
 const [signupSuccess, setSignupSuccess] = useState(false)
 const [isSigningUp, setIsSigningUp] = useState(false)
-
-const validateFirstname = (firstname: string): string => {
-  if (!firstname.trim()) return ''
-
-  if (/[^a-zA-Z ]/.test(firstname)) {
-      return 'Invalid Firstname! Please use letters only.'
-  }
-  return ''
-}
-
-const validateLastname = (lastname: string): string => {
-  if (!lastname.trim()) return ''
-
-  if (/[^a-zA-Z ]/.test(lastname)) {
-      return 'Invalid Lastname! Please use letters only.'
-  }
-  return ''
-}
+const [isGoogleSigningUp, setIsGoogleSigningUp] = useState(false)
 
 const validateEmail = (email: string): string => {
   if (!email.trim()) return ''
@@ -79,61 +63,16 @@ const validateEmail = (email: string): string => {
   return ''
 }
 
-const validatePassword = (password: string): string => {
-
-  if (!password.trim()) return ''
-
-  if (/\s/.test(password)) {
-      return 'Password should not contain spaces.'
-  } else if (password.length < 6) {
-      return 'Weak Password. Please enter at least 6 characters.'
-  }
-  return ''
-
-}
-
-const validateConfirmPassword = (password: string, confirmpass: string): string => {
-
-  if (!confirmpass.trim()) return ''
-
-  if (password !== confirmpass) {
-      return 'Your passwords didn’t match, please try again!'
-  }
-  return ''
-
-}
-
 const handleSignupInputChange = (field: string, value: string) => {
 
   setIsSignupFormDefault(true)
 
   setFormData((prev) => ({ ...prev, [field]: value }))
 
-  if (field === 'firstname') {
-      setErrors((prev) => ({
-          ...prev,
-          firstname: validateFirstname(value),
-      }))
-  } else if (field === 'lastname') {
-    setErrors((prev) => ({
-        ...prev,
-        lastname: validateLastname(value,)
-      }))
-  } else if (field === 'email') {
+  if (field === 'email') {
     setErrors((prev) => ({
         ...prev,
         email: validateEmail(value,)
-      }))
-  } else if (field === 'password') {
-      setErrors((prev) => ({
-          ...prev,
-          password: validatePassword(value),
-          confirmpass: validateConfirmPassword(value, formData.confirmpass)
-      }))
-  } else if (field === 'confirmpass') {
-      setErrors((prev) => ({
-          ...prev,
-          confirmpass: validateConfirmPassword(formData.password, value)
       }))
   }
 
@@ -145,18 +84,10 @@ useEffect(() => {
   return
 
   const isSignupFormEmpty =
-      !(formData.firstname?.trim()) ||
-      !(formData.lastname?.trim()) ||
-      !(formData.email?.trim()) ||
-      !(formData.password?.trim()) ||
-      !(formData.confirmpass?.trim())
+      !(formData.email?.trim())
 
   const hasSignupErrors =
-      errors.firstname ||
-      errors.lastname ||
-      errors.email ||
-      errors.password ||
-      errors.confirmpass
+      errors.email
 
   const signupFormError = isSignupFormEmpty
       ? 'There are empty fields, please adjust them properly.'
@@ -170,23 +101,53 @@ useEffect(() => {
 
 }, [formData, isSignupFormDefault, signupSuccess])
 
+const handleGoogleSignUp = async () => {
+  setIsGoogleSigningUp(true)
+
+  try {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    })
+
+    if (error) {
+      setErrors((prev) => ({
+        ...prev,
+        signupForm: "An unexpected error occurred. Please try again later.",
+      }))
+      setIsGoogleSigningUp(false)
+      return
+    }
+
+    if (data?.url) {
+      window.location.href = data.url
+    } else {
+      setErrors((prev) => ({
+        ...prev,
+        signupForm: "Failed to initiate Google Sign-Up. Please try again.",
+      }));
+      setIsGoogleSigningUp(false)
+    }
+  } catch (error) {
+    setErrors((prev) => ({
+      ...prev,
+      signupForm: "An unexpected error occurred. Please try again later.",
+    }))
+    setIsGoogleSigningUp(false)
+  }
+}
+
 const handleSignupSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 
   e.preventDefault()
 
   const isSignupFormEmpty =
-      !(formData.firstname?.trim()) ||
-      !(formData.lastname?.trim()) ||
-      !(formData.email?.trim()) ||
-      !(formData.password?.trim()) ||
-      !(formData.confirmpass?.trim())
+      !(formData.email?.trim())
 
   const hasSignupErrors =
-      errors.firstname ||
-      errors.lastname ||
-      errors.email ||
-      errors.password ||
-      errors.confirmpass
+      errors.email
 
   const signupFormError = isSignupFormEmpty
       ? 'There are empty fields, please adjust them properly.'
@@ -304,30 +265,18 @@ const handleLogin2 = () => {
               <div className="absolute flex items-center justify-center bg-[#e85151] top-3 right-3 text-white-500 rounded-lg shadow-md hover:bg-[#bf3737] text-4xl font-light cursor-pointer w-8 h-8 transition-all duration-300 ease-in-out" onClick={hide}>&times;</div>
               <h2 className="text-3xl mb-6 text-zinc-600 text-center">Sign Up on Waste2Earn</h2>
 
-              {errors.firstname && (<span><p className="text-red-700">{errors.firstname}</p></span>)}
-              <input type="text" name="firstName"
-              value={formData.firstname ?? ''} onChange={(e) => handleSignupInputChange('firstname', e.target.value)} placeholder="First Name" className="w-full font-extralight text-neutral-600 text-lg p-2 mb-5 border rounded" />
-              
-               {errors.lastname && (<span><p className="text-red-700">{errors.lastname}</p></span>)}
-              <input type="text" name="lastName" 
-              value={formData.lastname ?? ''} onChange={(e) => handleSignupInputChange('lastname', e.target.value)} placeholder="Last Name" className="w-full font-extralight text-neutral-600 text-lg p-2 mb-5 border rounded" />
-              
               {errors.email && (<span><p className="text-red-700">{errors.email}</p></span>)}
               <input type="email" name="email" 
               value={formData.email ?? ''} onChange={(e) => handleSignupInputChange('email', e.target.value)} placeholder="Email" className="w-full font-extralight text-neutral-600 text-lg p-2 mb-5 border rounded" />
-              
-              {errors.password && (<span><p className="text-red-700">{errors.password}</p></span>)}
-              <input type="password" name="" 
-              value={formData.password ?? ''} onChange={(e) => handleSignupInputChange('password', e.target.value)} placeholder="Password" className="w-full font-extralight text-neutral-600 text-lg p-2 mb-5 border rounded" />
 
-              {errors.confirmpass && (<span><p className="text-red-700">{errors.confirmpass}</p></span>)}
-              <input type="password" name="confirmpass" 
-              value={formData.confirmpass ?? ''} onChange={(e) => handleSignupInputChange('confirmpass', e.target.value)} placeholder="Confirm Password" className="w-full font-extralight text-neutral-600 text-lg p-2 mb-5 border rounded" />
-              
+              <div onClick={handleGoogleSignUp} className="w-full h=[40px] flex items-center justify-center bg-[#04588f] mb-6 text-white text-1xl p-2 rounded cursor-pointer hover:bg-[#015891] transition-all duration-300 ease-in-out">
+                  <img className="absolute w-6 h-6 left-10" src="https://www.svgrepo.com/show/475656/google-color.svg" loading="lazy" alt="google logo" />
+                  <span> {isGoogleSigningUp ? ('Authenticating') : ('Sign Up with Google')}</span>
+              </div>
 
               {signupSuccess && (<span><p className="text-red-700">{signupSuccess}</p></span>)}
               {errors.signupForm && (<span><p className="text-red-700">{errors.signupForm}</p></span>)}
-              <button type="submit" className="w-full bg-[#067ac7] mb-6 text-white text-2xl p-2 rounded hover:bg-[#015891] transition-all duration-300 ease-in-out">Sign Up</button>
+              <button type="submit" className="w-full bg-[#067ac7] mb-6 text-white text-2xl p-2 rounded hover:bg-[#015891] transition-all duration-300 ease-in-out">{isSigningUp ? ('Signing Up') : ('Sign Up')}</button>
             
             </form>
 
