@@ -50,7 +50,7 @@ const [signupFormError, setSignupFormError] = useState(false)
 const [signupSuccess, setSignupSuccess] = useState(false)
 const [isSigningUp, setIsSigningUp] = useState(false)
 
-const validateFirstname = (firstname) => {
+const validateFirstname = (firstname: string): string => {
   if (!firstname.trim()) return ''
 
   if (/[^a-zA-Z ]/.test(firstname)) {
@@ -59,7 +59,7 @@ const validateFirstname = (firstname) => {
   return ''
 }
 
-const validateLastname = (lastname) => {
+const validateLastname = (lastname: string): string => {
   if (!lastname.trim()) return ''
 
   if (/[^a-zA-Z ]/.test(lastname)) {
@@ -68,7 +68,7 @@ const validateLastname = (lastname) => {
   return ''
 }
 
-const validateEmail = (email) => {
+const validateEmail = (email: string): string => {
   if (!email.trim()) return ''
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -79,7 +79,7 @@ const validateEmail = (email) => {
   return ''
 }
 
-const validatePassword = (password) => {
+const validatePassword = (password: string): string => {
 
   if (!password.trim()) return ''
 
@@ -92,7 +92,7 @@ const validatePassword = (password) => {
 
 }
 
-const validateConfirmPassword = (password, confirmpass) => {
+const validateConfirmPassword = (password: string, confirmpass: string): string => {
 
   if (!confirmpass.trim()) return ''
 
@@ -103,7 +103,7 @@ const validateConfirmPassword = (password, confirmpass) => {
 
 }
 
-const handleSignupInputChange = (field, value) => {
+const handleSignupInputChange = (field: string, value: string) => {
 
   setIsSignupFormDefault(true)
 
@@ -170,7 +170,7 @@ useEffect(() => {
 
 }, [formData, isSignupFormDefault, signupSuccess])
 
-const handleSignupSubmit = async (e) => {
+const handleSignupSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 
   e.preventDefault()
 
@@ -196,15 +196,14 @@ const handleSignupSubmit = async (e) => {
 
   setErrors((prev) => ({ ...prev, signupForm: signupFormError }))
       if (signupFormError) {
-      setSignupSuccess('')
+      setSignupSuccess(false)
       return
   }
 
   if (!signupFormError) {
 
       setIsSigningUp(true)
-
-      
+  
   }
 
 }
