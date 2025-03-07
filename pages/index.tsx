@@ -1,4 +1,5 @@
-import type { GetStaticPropsResult, NextPage } from 'next'
+import React, { useState, useEffect } from 'react';
+import type { GetStaticPropsResult, NextPage } from 'next';
 import Link from 'next/link';
 import { NextSeo } from 'next-seo';
 // import '../styles/style.css';
@@ -35,6 +36,205 @@ const Home: NextPage<BlogProps> = ({ allPostsData, activeProposals }) => {
   const loginUrl = "https://hm7ne-saaaa-aaaao-qezaq-cai.icp0.io/";
   
   window.open(loginUrl, "_blank");
+};
+
+const [showSignUp, setShowSignUp] = useState(false)
+const show = () => setShowSignUp(true)
+const hide = () => setShowSignUp(false)
+
+const [formData, setFormData] = useState({ firstname: '', lastname: '', email: '', password: '', confirmpass: ''})
+const [errors, setErrors] = useState({ firstname: '', lastname: '', email: '', password: '', confirmpass: '', signupForm: '' })
+
+const [isSignupFormDefault, setIsSignupFormDefault] = useState(false)
+const [signupFormError, setSignupFormError] = useState(false)
+const [signupSuccess, setSignupSuccess] = useState(false)
+const [isSigningUp, setIsSigningUp] = useState(false)
+
+const validateFirstname = (firstname) => {
+  if (!firstname.trim()) return ''
+
+  if (/[^a-zA-Z ]/.test(firstname)) {
+      return 'Invalid Firstname! Please use letters only.'
+  }
+  return ''
+}
+
+const validateLastname = (lastname) => {
+  if (!lastname.trim()) return ''
+
+  if (/[^a-zA-Z ]/.test(lastname)) {
+      return 'Invalid Lastname! Please use letters only.'
+  }
+  return ''
+}
+
+const validateEmail = (email) => {
+  if (!email.trim()) return ''
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+  if (!emailRegex.test(email)) {
+      return 'Invalid Email! Please enter a valid email address.'
+  }
+  return ''
+}
+
+const validatePassword = (password) => {
+
+  if (!password.trim()) return ''
+
+  if (/\s/.test(password)) {
+      return 'Password should not contain spaces.'
+  } else if (password.length < 6) {
+      return 'Weak Password. Please enter at least 6 characters.'
+  }
+  return ''
+
+}
+
+const validateConfirmPassword = (password, confirmpass) => {
+
+  if (!confirmpass.trim()) return ''
+
+  if (password !== confirmpass) {
+      return 'Your passwords didn’t match, please try again!'
+  }
+  return ''
+
+}
+
+const handleSignupInputChange = (field, value) => {
+
+  setIsSignupFormDefault(true)
+
+  setFormData((prev) => ({ ...prev, [field]: value }))
+
+  if (field === 'firstname') {
+      setErrors((prev) => ({
+          ...prev,
+          firstname: validateFirstname(value),
+      }))
+  } else if (field === 'lastname') {
+    setErrors((prev) => ({
+        ...prev,
+        lastname: validateLastname(value,)
+      }))
+  } else if (field === 'email') {
+    setErrors((prev) => ({
+        ...prev,
+        email: validateEmail(value,)
+      }))
+  } else if (field === 'password') {
+      setErrors((prev) => ({
+          ...prev,
+          password: validatePassword(value),
+          confirmpass: validateConfirmPassword(value, formData.confirmpass)
+      }))
+  } else if (field === 'confirmpass') {
+      setErrors((prev) => ({
+          ...prev,
+          confirmpass: validateConfirmPassword(formData.password, value)
+      }))
+  }
+
+}
+
+useEffect(() => {
+
+  if (!isSignupFormDefault || signupSuccess) 
+  return
+
+  const isSignupFormEmpty =
+      !(formData.firstname?.trim()) ||
+      !(formData.lastname?.trim()) ||
+      !(formData.email?.trim()) ||
+      !(formData.password?.trim()) ||
+      !(formData.confirmpass?.trim())
+
+  const hasSignupErrors =
+      errors.firstname ||
+      errors.lastname ||
+      errors.email ||
+      errors.password ||
+      errors.confirmpass
+
+  const signupFormError = isSignupFormEmpty
+      ? 'There are empty fields, please adjust them properly.'
+      : hasSignupErrors
+      ? 'There are incorrect fields, please adjust them properly.'
+      : ''
+
+  setErrors((prev) => ({
+      ...prev, signupForm: signupFormError
+  }))
+
+}, [formData, isSignupFormDefault, signupSuccess])
+
+const handleSignupSubmit = async (e) => {
+
+  e.preventDefault()
+
+  const isSignupFormEmpty =
+      !(formData.firstname?.trim()) ||
+      !(formData.lastname?.trim()) ||
+      !(formData.email?.trim()) ||
+      !(formData.password?.trim()) ||
+      !(formData.confirmpass?.trim())
+
+  const hasSignupErrors =
+      errors.firstname ||
+      errors.lastname ||
+      errors.email ||
+      errors.password ||
+      errors.confirmpass
+
+  const signupFormError = isSignupFormEmpty
+      ? 'There are empty fields, please adjust them properly.'
+      : hasSignupErrors
+      ? 'There are incorrect fields, please adjust them properly.'
+      : ''
+
+  setErrors((prev) => ({ ...prev, signupForm: signupFormError }))
+      if (signupFormError) {
+      setSignupSuccess('')
+      return
+  }
+
+  if (!signupFormError) {
+
+      setIsSigningUp(true)
+
+      
+  }
+
+}
+
+const overlayStyle: React.CSSProperties = {
+  position: "fixed",
+  top: 0,
+  left: 0,
+  width: "100%",
+  height: "100%",
+  background: showSignUp ? "rgba(0, 0, 0, 0.6)" : "rgba(0, 0, 0, 0)",
+  zIndex: 500,
+  opacity: showSignUp ? 1 : 0,
+  pointerEvents: showSignUp ? "auto" : "none",
+  backdropFilter: showSignUp ? "blur(5px)" : "blur(0)",
+  overflow: showSignUp ? "clip" : "auto",
+  transition: "all 0.3s ease"
+};
+
+const signupForm: React.CSSProperties = {
+  position: "fixed",
+  top: 0,
+  left: 0,
+  width: "100%",
+  height: "100%",
+  zIndex: 600,
+  opacity: showSignUp ? 1 : 0,
+  visibility: showSignUp ? "visible" : "hidden",
+  pointerEvents: showSignUp ? "auto" : "none",
+  transition: "all 0.3s ease"
 };
 
 const handleLogin2 = () => {
@@ -93,6 +293,49 @@ const handleLogin2 = () => {
               </div>
             </div>
           ) : null}
+
+        <div style={overlayStyle}></div>
+
+        <div style={signupForm}>
+
+          <div className="flex items-center justify-center min-h-screen transition-all duration-300 ease-in-out">
+
+            <form className="relative w-[320px] md:w-[420px] bg-[#dbd9d9] p-6 rounded-lg shadow-md"  onSubmit={handleSignupSubmit} noValidate>
+
+              <div className="absolute flex items-center justify-center bg-[#e85151] top-3 right-3 text-white-500 rounded-lg shadow-md hover:bg-[#bf3737] text-4xl font-light cursor-pointer w-8 h-8 transition-all duration-300 ease-in-out" onClick={hide}>&times;</div>
+              <h2 className="text-3xl mb-6 text-zinc-600 text-center">Sign Up on Waste2Earn</h2>
+
+              {errors.firstname && (<span><p className="text-red-700">{errors.firstname}</p></span>)}
+              <input type="text" name="firstName"
+              value={formData.firstname ?? ''} onChange={(e) => handleSignupInputChange('firstname', e.target.value)} placeholder="First Name" className="w-full font-extralight text-neutral-600 text-lg p-2 mb-5 border rounded" />
+              
+               {errors.lastname && (<span><p className="text-red-700">{errors.lastname}</p></span>)}
+              <input type="text" name="lastName" 
+              value={formData.lastname ?? ''} onChange={(e) => handleSignupInputChange('lastname', e.target.value)} placeholder="Last Name" className="w-full font-extralight text-neutral-600 text-lg p-2 mb-5 border rounded" />
+              
+              {errors.email && (<span><p className="text-red-700">{errors.email}</p></span>)}
+              <input type="email" name="email" 
+              value={formData.email ?? ''} onChange={(e) => handleSignupInputChange('email', e.target.value)} placeholder="Email" className="w-full font-extralight text-neutral-600 text-lg p-2 mb-5 border rounded" />
+              
+              {errors.password && (<span><p className="text-red-700">{errors.password}</p></span>)}
+              <input type="password" name="" 
+              value={formData.password ?? ''} onChange={(e) => handleSignupInputChange('password', e.target.value)} placeholder="Password" className="w-full font-extralight text-neutral-600 text-lg p-2 mb-5 border rounded" />
+
+              {errors.confirmpass && (<span><p className="text-red-700">{errors.confirmpass}</p></span>)}
+              <input type="password" name="confirmpass" 
+              value={formData.confirmpass ?? ''} onChange={(e) => handleSignupInputChange('confirmpass', e.target.value)} placeholder="Confirm Password" className="w-full font-extralight text-neutral-600 text-lg p-2 mb-5 border rounded" />
+              
+
+              {signupSuccess && (<span><p className="text-red-700">{signupSuccess}</p></span>)}
+              {errors.signupForm && (<span><p className="text-red-700">{errors.signupForm}</p></span>)}
+              <button type="submit" className="w-full bg-[#067ac7] mb-6 text-white text-2xl p-2 rounded hover:bg-[#015891] transition-all duration-300 ease-in-out">Sign Up</button>
+            
+            </form>
+
+          </div>
+
+        </div>
+
           <h1 className="md:text-5xl text-3xl md:leading-[3.5rem] md:text-center">
           Waste Revalued
           </h1>
@@ -112,6 +355,15 @@ const handleLogin2 = () => {
                 desc={<span className="text-white text-2xl system md:block hidden">&rarr;</span>}
                 icon="/assets/icon/wasticon.svg">
                 Was2pia CoreGame 
+              </Button>
+            </div>
+            <div onClick={show}>
+              <Button
+                tertiary
+                // className="hover-walk"
+                desc={<span className="text-white text-2xl system md:block hidden">&rarr;</span>}
+                icon="/assets/icon/create.png">
+                Sign Up
               </Button>
             </div>
             <div className="md:flex md:flex-row md:space-y-0 space-y-2 md:space-x-2 items-stretch text-black">
