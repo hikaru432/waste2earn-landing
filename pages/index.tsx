@@ -10,6 +10,7 @@ import {getSortedPostsData, PostData} from "../lib/posts";
 import { COPY, IMAGES, SITE_URL } from '../lib/constants';
 import {loadActiveProposals, Proposal} from '../lib/snapshot';
 import supabase from '../supabase/supabase';
+import supabaseSession from '../supabase/supabaseSession';
 //latest sign up
 
 type BlogProps = {
@@ -162,7 +163,9 @@ const handleGoogleSignUp = async () => {
     }
 
     if (data?.url) {
+
       window.location.href = data.url
+      
     } else {
       setErrors((prev) => ({
         ...prev,
@@ -246,12 +249,11 @@ const handleSignupSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         setIsSigningUp(false)
 
         setFormData({
-          firstname: '',
-          lastname: '',
           email: '',
           password: '',
           confirmpassword: ''
         })
+        
       }
         
     } catch (error) {
@@ -300,6 +302,12 @@ const handleLogin2 = () => {
   window.open(loginUrl, "_blank");
 };
 
+  const {
+    loading,
+    user,
+    userDetails
+  } = supabaseSession()
+
   return (
     <>
       <NextSeo
@@ -330,6 +338,8 @@ const handleLogin2 = () => {
         {/**
           * Section: Introduction
           */}
+      {!user && !userDetails ? (
+        <>
         <div className="space-y-6">
           {activeProposals && activeProposals.proposals.length > 0 ? (
             <div className="pb-6">
@@ -548,6 +558,23 @@ const handleLogin2 = () => {
           <p>{`Subscribe to Waste2Earn and we'll send major Waste2Earn updates straight to your inbox.`}</p>
           <iframe src="https://waste2earn.substack.com/embed" width="100%" frameBorder="0" scrolling="no"></iframe>
         </div>
+        </>
+	):(
+		<>
+
+        <div className="space-y-2">
+            <div onClick={handleLogin}>
+              <Button
+                primary
+                desc={<span className="text-white text-2xl system md:block hidden">&rarr;</span>}
+                icon="/assets/icon/snapshot.svg">
+                Open/Create Wallet 
+              </Button>
+            </div>
+        </div>
+    
+    </>
+	)} 
       </Wrapper>
     </>
   )
