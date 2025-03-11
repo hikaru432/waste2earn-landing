@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 import type { GetStaticPropsResult, NextPage } from 'next'
 import Link from 'next/link';
 import { NextSeo } from 'next-seo';
@@ -302,7 +302,7 @@ const handleLogin2 = () => {
   )
 }
 
-=======
+
 import React, { useState, useEffect } from 'react';
 import type { GetStaticPropsResult, NextPage } from 'next';
 import Link from 'next/link';
@@ -314,7 +314,12 @@ import Wrapper from '../components/Wrapper';
 import {getSortedPostsData, PostData} from "../lib/posts";
 import { COPY, IMAGES, SITE_URL } from '../lib/constants';
 import {loadActiveProposals, Proposal} from '../lib/snapshot';
+
 // import '../styles/logo.css'
+
+import supabase from '../supabase/supabase';
+import supabaseSession from '../supabase/supabaseSession';
+//latest sign up
 
 type BlogProps = {
   allPostsData: PostData[];
@@ -348,33 +353,16 @@ const [showSignUp, setShowSignUp] = useState(false)
 const show = () => setShowSignUp(true)
 const hide = () => setShowSignUp(false)
 
-const [formData, setFormData] = useState({ firstname: '', lastname: '', email: '', password: '', confirmpass: ''})
-const [errors, setErrors] = useState({ firstname: '', lastname: '', email: '', password: '', confirmpass: '', signupForm: '' })
+const [formData, setFormData] = useState({ email: '', password: '', confirmpassword: '' })
+const [errors, setErrors] = useState({ email: '', password: '', confirmpassword: '', signupForm: '' })
 
 const [isSignupFormDefault, setIsSignupFormDefault] = useState(false)
 const [signupFormError, setSignupFormError] = useState(false)
 const [signupSuccess, setSignupSuccess] = useState(false)
 const [isSigningUp, setIsSigningUp] = useState(false)
+const [isGoogleSigningUp, setIsGoogleSigningUp] = useState(false)
 
-const validateFirstname = (firstname) => {
-  if (!firstname.trim()) return ''
-
-  if (/[^a-zA-Z ]/.test(firstname)) {
-      return 'Invalid Firstname! Please use letters only.'
-  }
-  return ''
-}
-
-const validateLastname = (lastname) => {
-  if (!lastname.trim()) return ''
-
-  if (/[^a-zA-Z ]/.test(lastname)) {
-      return 'Invalid Lastname! Please use letters only.'
-  }
-  return ''
-}
-
-const validateEmail = (email) => {
+const validateEmail = (email: string): string => {
   if (!email.trim()) return ''
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -385,7 +373,7 @@ const validateEmail = (email) => {
   return ''
 }
 
-const validatePassword = (password) => {
+const validatePassword = (password: string): string => {
 
   if (!password.trim()) return ''
 
@@ -398,49 +386,39 @@ const validatePassword = (password) => {
 
 }
 
-const validateConfirmPassword = (password, confirmpass) => {
+const validateConfirmPassword = (password: string, confirmpassword: string): string => {
 
-  if (!confirmpass.trim()) return ''
+  if (!confirmpassword.trim()) return ''
 
-  if (password !== confirmpass) {
+  if (password !== confirmpassword) {
       return 'Your passwords didn’t match, please try again!'
   }
   return ''
 
 }
 
-const handleSignupInputChange = (field, value) => {
+const handleSignupInputChange = (field: string, value: string) => {
 
   setIsSignupFormDefault(true)
 
   setFormData((prev) => ({ ...prev, [field]: value }))
 
-  if (field === 'firstname') {
-      setErrors((prev) => ({
-          ...prev,
-          firstname: validateFirstname(value),
-      }))
-  } else if (field === 'lastname') {
-    setErrors((prev) => ({
-        ...prev,
-        lastname: validateLastname(value,)
-      }))
-  } else if (field === 'email') {
+  if (field === 'email') {
     setErrors((prev) => ({
         ...prev,
         email: validateEmail(value,)
       }))
   } else if (field === 'password') {
       setErrors((prev) => ({
-          ...prev,
-          password: validatePassword(value),
-          confirmpass: validateConfirmPassword(value, formData.confirmpass)
-      }))
-  } else if (field === 'confirmpass') {
+      ...prev,
+      password : validatePassword(value),
+      confirmpassword: validateConfirmPassword(value, formData.confirmpassword)
+    }))
+  } else if (field === 'confirmpassword') {
       setErrors((prev) => ({
-          ...prev,
-          confirmpass: validateConfirmPassword(formData.password, value)
-      }))
+      ...prev,
+      confirmpassword: validateConfirmPassword(formData.password, value)
+    }))
   }
 
 }
@@ -451,18 +429,14 @@ useEffect(() => {
   return
 
   const isSignupFormEmpty =
-      !(formData.firstname?.trim()) ||
-      !(formData.lastname?.trim()) ||
       !(formData.email?.trim()) ||
       !(formData.password?.trim()) ||
-      !(formData.confirmpass?.trim())
+      !(formData.confirmpassword?.trim())
 
   const hasSignupErrors =
-      errors.firstname ||
-      errors.lastname ||
       errors.email ||
       errors.password ||
-      errors.confirmpass
+      errors.confirmpassword
 
   const signupFormError = isSignupFormEmpty
       ? 'There are empty fields, please adjust them properly.'
@@ -476,23 +450,60 @@ useEffect(() => {
 
 }, [formData, isSignupFormDefault, signupSuccess])
 
-const handleSignupSubmit = async (e) => {
+const handleGoogleSignUp = async () => {
+  setIsGoogleSigningUp(true)
+
+  try {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}`,
+      },
+    })
+
+    if (error) {
+      setErrors((prev) => ({
+        ...prev,
+        signupForm: "An unexpected error occurred. Please try again later.",
+      }))
+      setIsGoogleSigningUp(false)
+      return
+    }
+
+    if (data?.url) {
+
+      window.location.href = data.url
+      
+    } else {
+      setErrors((prev) => ({
+        ...prev,
+        signupForm: "Failed to initiate Google Sign-Up. Please try again.",
+      }));
+      setIsGoogleSigningUp(false)
+    }
+
+  } catch (error) {
+    setErrors((prev) => ({
+      ...prev,
+      signupForm: "An unexpected error occurred. Please try again later.",
+    }))
+    setIsGoogleSigningUp(false)
+  }
+}
+
+const handleSignupSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 
   e.preventDefault()
 
   const isSignupFormEmpty =
-      !(formData.firstname?.trim()) ||
-      !(formData.lastname?.trim()) ||
       !(formData.email?.trim()) ||
       !(formData.password?.trim()) ||
-      !(formData.confirmpass?.trim())
+      !(formData.confirmpassword?.trim())
 
   const hasSignupErrors =
-      errors.firstname ||
-      errors.lastname ||
       errors.email ||
       errors.password ||
-      errors.confirmpass
+      errors.confirmpassword
 
   const signupFormError = isSignupFormEmpty
       ? 'There are empty fields, please adjust them properly.'
@@ -502,7 +513,7 @@ const handleSignupSubmit = async (e) => {
 
   setErrors((prev) => ({ ...prev, signupForm: signupFormError }))
       if (signupFormError) {
-      setSignupSuccess('')
+      setSignupSuccess(false)
       return
   }
 
@@ -510,7 +521,57 @@ const handleSignupSubmit = async (e) => {
 
       setIsSigningUp(true)
 
+      try {
+
+        const { data: existingEmail, error: emailError } = await supabase
+            .from('users')
+            .select('email')
+            .eq('email', formData.email)
+  
+        if (existingEmail && existingEmail.length > 0) {
+            setErrors((prev) => ({
+              ...prev,
+              signupForm: "Email is unavailable. Please choose another one.",
+            }))
+            setIsSigningUp(false)
+            return
+        }
+
+        const { data: authData, error: authError } = await supabase.auth.signUp({
+          email: formData.email,
+          password: formData.password
+      })
+
+      if (authError) {
+        setErrors((prev) => ({
+            ...prev,
+            signupForm:  'An unexpected error has occurred. Please try again later.'
+        }))
+      }
       
+      if (authData) {
+
+        setSignupSuccess("Your information has been created successfully.")
+
+        setIsSignupFormDefault(false)
+        setIsSigningUp(false)
+
+        setFormData({
+          email: '',
+          password: '',
+          confirmpassword: ''
+        })
+        
+      }
+        
+    } catch (error) {
+      setErrors((prev) => ({
+        ...prev,
+        signupForm: "An unexpected error occurred. Please try again later.",
+      }))
+      setIsSigningUp(false)
+    }
+  
   }
 
 }
@@ -549,6 +610,19 @@ const handleLogin2 = () => {
   window.open(loginUrl, "_blank");
 };
 
+  const {
+    loading,
+    user,
+    userDetails
+  } = supabaseSession()
+
+
+  if (loading) {
+    return (
+      <div><Wrapper variant="farm"><div className="flex items-center text-3xl justify-center transition-all duration-300 ease-in-out">Loading</div></Wrapper></div>
+  )
+  }
+
   return (
     <>
       <NextSeo
@@ -579,6 +653,8 @@ const handleLogin2 = () => {
         {/**
           * Section: Introduction
           */}
+      {!user && !userDetails ? (
+        <>
         <div className="space-y-6">
           {activeProposals && activeProposals.proposals.length > 0 ? (
             <div className="pb-6">
@@ -609,32 +685,31 @@ const handleLogin2 = () => {
             <form className="relative w-[320px] md:w-[420px] bg-[#dbd9d9] p-6 rounded-lg shadow-md"  onSubmit={handleSignupSubmit} noValidate>
 
               <div className="absolute flex items-center justify-center bg-[#e85151] top-3 right-3 text-white-500 rounded-lg shadow-md hover:bg-[#bf3737] text-4xl font-light cursor-pointer w-8 h-8 transition-all duration-300 ease-in-out" onClick={hide}>&times;</div>
-              <h2 className="text-3xl mb-6 text-zinc-600 text-center">Sign Up on Waste2Earn</h2>
+              <h2 className="text-3xl mb-4 text-zinc-600 text-center">Sign Up on Waste2Earn</h2>
 
-              {errors.firstname && (<span><p className="text-red-700">{errors.firstname}</p></span>)}
-              <input type="text" name="firstName"
-              value={formData.firstname ?? ''} onChange={(e) => handleSignupInputChange('firstname', e.target.value)} placeholder="First Name" className="w-full font-extralight text-neutral-600 text-lg p-2 mb-5 border rounded" />
-              
-               {errors.lastname && (<span><p className="text-red-700">{errors.lastname}</p></span>)}
-              <input type="text" name="lastName" 
-              value={formData.lastname ?? ''} onChange={(e) => handleSignupInputChange('lastname', e.target.value)} placeholder="Last Name" className="w-full font-extralight text-neutral-600 text-lg p-2 mb-5 border rounded" />
-              
               {errors.email && (<span><p className="text-red-700">{errors.email}</p></span>)}
               <input type="email" name="email" 
-              value={formData.email ?? ''} onChange={(e) => handleSignupInputChange('email', e.target.value)} placeholder="Email" className="w-full font-extralight text-neutral-600 text-lg p-2 mb-5 border rounded" />
-              
+              value={formData.email ?? ''} onChange={(e) => handleSignupInputChange('email', e.target.value)} placeholder="Email" className="w-full font-extralight text-neutral-600 text-lg p-2 mb-4 border rounded" />
+
+              <div>
               {errors.password && (<span><p className="text-red-700">{errors.password}</p></span>)}
-              <input type="password" name="" 
-              value={formData.password ?? ''} onChange={(e) => handleSignupInputChange('password', e.target.value)} placeholder="Password" className="w-full font-extralight text-neutral-600 text-lg p-2 mb-5 border rounded" />
+              <input id="hs-toggle-password" type="password" name="password" 
+              value={formData.password ?? ''} onChange={(e) => handleSignupInputChange('password', e.target.value)} placeholder="Password" className="w-full font-extralight text-neutral-600 text-lg p-2 mb-4 border rounded" />
+              </div>
 
-              {errors.confirmpass && (<span><p className="text-red-700">{errors.confirmpass}</p></span>)}
-              <input type="password" name="confirmpass" 
-              value={formData.confirmpass ?? ''} onChange={(e) => handleSignupInputChange('confirmpass', e.target.value)} placeholder="Confirm Password" className="w-full font-extralight text-neutral-600 text-lg p-2 mb-5 border rounded" />
-              
+              {errors.confirmpassword && (<span><p className="text-red-700">{errors.confirmpassword}</p></span>)}
 
-              {signupSuccess && (<span><p className="text-red-700">{signupSuccess}</p></span>)}
+              <input type="password" name="confirmpassword" 
+              value={formData.confirmpassword ?? ''} onChange={(e) => handleSignupInputChange('confirmpassword', e.target.value)} placeholder="Confirm Password" className="w-full font-extralight text-neutral-600 text-lg p-2 mb-4 border rounded" />
+
+              <div onClick={handleGoogleSignUp} className="w-full h=[40px] flex items-center justify-center bg-[#04588f] mb-4 text-white text-1xl p-2 rounded cursor-pointer hover:bg-[#003354] transition-all duration-300 ease-in-out">
+                  <img className="absolute w-6 h-6 left-10" src="https://www.svgrepo.com/show/475656/google-color.svg" loading="lazy" alt="google logo" />
+                  <span> {isGoogleSigningUp ? ('Authenticating') : ('Sign Up with Google')}</span>
+              </div>
+
+              {signupSuccess && (<span><p className="text-blue-700">{signupSuccess}</p></span>)}
               {errors.signupForm && (<span><p className="text-red-700">{errors.signupForm}</p></span>)}
-              <button type="submit" className="w-full bg-[#067ac7] mb-6 text-white text-2xl p-2 rounded hover:bg-[#015891] transition-all duration-300 ease-in-out">Sign Up</button>
+              <button type="submit" className="w-full bg-[#067ac7] mb-4 text-white text-2xl p-2 rounded hover:bg-[#015891] transition-all duration-300 ease-in-out">{isSigningUp ? ('Signing Up') : ('Sign Up')}</button>
             
             </form>
 
@@ -798,6 +873,7 @@ const handleLogin2 = () => {
           <p>{`Subscribe to Waste2Earn and we'll send major Waste2Earn updates straight to your inbox.`}</p>
           <iframe src="https://waste2earn.substack.com/embed" width="100%" frameBorder="0" scrolling="no"></iframe>
         </div>
+
         
         {/* Partners */}
         <div className="space-y-4 p-[16px] rounded-lg">
@@ -829,6 +905,19 @@ const handleLogin2 = () => {
             </div>
           </div>
         {/*latest commit*/}
+
+        </>
+	):(
+		<>
+      <div className="flex font-normal text-2xl bg- shadow-md rounded px-8 pt-6 mb-8"><span>Welcome, {userDetails?.email?.split('@')[0]}<br/></span>
+      <span>{userDetails?.firstname || 'No Firstname'}<br/></span>
+      <span>{userDetails?.lastname || 'No Lastname'}<br/></span>
+      <span>{userDetails?.role || 'No Role'}<br/></span>
+      <span>{new Date(userDetails?.created_at).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}</span>
+      </div>
+    </>
+	)} 
+
       </Wrapper>
     </>
   )
