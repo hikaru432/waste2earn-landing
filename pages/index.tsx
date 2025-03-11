@@ -828,11 +828,10 @@ const handleLogin2 = () => {
               </div>
             </div>
           </div>
-        
+        {/*latest commit*/}
       </Wrapper>
     </>
   )
 }
 
->>>>>>> upstream/main
 export default Home
