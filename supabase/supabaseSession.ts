@@ -29,13 +29,32 @@ function supabaseSession() {
                     return
                 }
 
-                setUser(sessionData)
-                setUserDetails(sessionData)
+                if (sessionData) {
+
+                    const session = sessionData.user
+
+                    const { data: userDetails, error: userDetailsError } = await supabase
+                        .from('users')
+                        .select('*')
+                        .eq('auth_id', session.id)
+                        .single()
+
+                    if (userDetailsError) {
+                        console.log('userDetailsError')
+                    }
+
+                    if (userDetails) {
+                        setUserDetails(userDetails)
+                    }
+                    
+                }
 
             } catch (error) {
                 console.log('error')
             } finally {
-                setLoading(false)
+                setTimeout(() => 
+                    setLoading(false), 240
+                ) 
             }
         }
     
