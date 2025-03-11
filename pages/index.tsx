@@ -1,4 +1,5 @@
-import type { GetStaticPropsResult, NextPage } from 'next'
+import React, { useState, useEffect } from 'react';
+import type { GetStaticPropsResult, NextPage } from 'next';
 import Link from 'next/link';
 import { NextSeo } from 'next-seo';
 // import '../styles/style.css';
@@ -8,6 +9,9 @@ import Wrapper from '../components/Wrapper';
 import {getSortedPostsData, PostData} from "../lib/posts";
 import { COPY, IMAGES, SITE_URL } from '../lib/constants';
 import {loadActiveProposals, Proposal} from '../lib/snapshot';
+import supabase from '../supabase/supabase';
+import supabaseSession from '../supabase/supabaseSession';
+//latest sign up
 
 type BlogProps = {
   allPostsData: PostData[];
@@ -37,11 +41,272 @@ const Home: NextPage<BlogProps> = ({ allPostsData, activeProposals }) => {
   window.open(loginUrl, "_blank");
 };
 
+const [showSignUp, setShowSignUp] = useState(false)
+const show = () => setShowSignUp(true)
+const hide = () => setShowSignUp(false)
+
+const [formData, setFormData] = useState({ email: '', password: '', confirmpassword: '' })
+const [errors, setErrors] = useState({ email: '', password: '', confirmpassword: '', signupForm: '' })
+
+const [isSignupFormDefault, setIsSignupFormDefault] = useState(false)
+const [signupFormError, setSignupFormError] = useState(false)
+const [signupSuccess, setSignupSuccess] = useState(false)
+const [isSigningUp, setIsSigningUp] = useState(false)
+const [isGoogleSigningUp, setIsGoogleSigningUp] = useState(false)
+
+const validateEmail = (email: string): string => {
+  if (!email.trim()) return ''
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+  if (!emailRegex.test(email)) {
+      return 'Invalid Email! Please enter a valid email address.'
+  }
+  return ''
+}
+
+const validatePassword = (password: string): string => {
+
+  if (!password.trim()) return ''
+
+  if (/\s/.test(password)) {
+      return 'Password should not contain spaces.'
+  } else if (password.length < 6) {
+      return 'Weak Password. Please enter at least 6 characters.'
+  }
+  return ''
+
+}
+
+const validateConfirmPassword = (password: string, confirmpassword: string): string => {
+
+  if (!confirmpassword.trim()) return ''
+
+  if (password !== confirmpassword) {
+      return 'Your passwords didn’t match, please try again!'
+  }
+  return ''
+
+}
+
+const handleSignupInputChange = (field: string, value: string) => {
+
+  setIsSignupFormDefault(true)
+
+  setFormData((prev) => ({ ...prev, [field]: value }))
+
+  if (field === 'email') {
+    setErrors((prev) => ({
+        ...prev,
+        email: validateEmail(value,)
+      }))
+  } else if (field === 'password') {
+      setErrors((prev) => ({
+      ...prev,
+      password : validatePassword(value),
+      confirmpassword: validateConfirmPassword(value, formData.confirmpassword)
+    }))
+  } else if (field === 'confirmpassword') {
+      setErrors((prev) => ({
+      ...prev,
+      confirmpassword: validateConfirmPassword(formData.password, value)
+    }))
+  }
+
+}
+
+useEffect(() => {
+
+  if (!isSignupFormDefault || signupSuccess) 
+  return
+
+  const isSignupFormEmpty =
+      !(formData.email?.trim()) ||
+      !(formData.password?.trim()) ||
+      !(formData.confirmpassword?.trim())
+
+  const hasSignupErrors =
+      errors.email ||
+      errors.password ||
+      errors.confirmpassword
+
+  const signupFormError = isSignupFormEmpty
+      ? 'There are empty fields, please adjust them properly.'
+      : hasSignupErrors
+      ? 'There are incorrect fields, please adjust them properly.'
+      : ''
+
+  setErrors((prev) => ({
+      ...prev, signupForm: signupFormError
+  }))
+
+}, [formData, isSignupFormDefault, signupSuccess])
+
+const handleGoogleSignUp = async () => {
+  setIsGoogleSigningUp(true)
+
+  try {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}`,
+      },
+    })
+
+    if (error) {
+      setErrors((prev) => ({
+        ...prev,
+        signupForm: "An unexpected error occurred. Please try again later.",
+      }))
+      setIsGoogleSigningUp(false)
+      return
+    }
+
+    if (data?.url) {
+
+      window.location.href = data.url
+      
+    } else {
+      setErrors((prev) => ({
+        ...prev,
+        signupForm: "Failed to initiate Google Sign-Up. Please try again.",
+      }));
+      setIsGoogleSigningUp(false)
+    }
+
+  } catch (error) {
+    setErrors((prev) => ({
+      ...prev,
+      signupForm: "An unexpected error occurred. Please try again later.",
+    }))
+    setIsGoogleSigningUp(false)
+  }
+}
+
+const handleSignupSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+
+  e.preventDefault()
+
+  const isSignupFormEmpty =
+      !(formData.email?.trim()) ||
+      !(formData.password?.trim()) ||
+      !(formData.confirmpassword?.trim())
+
+  const hasSignupErrors =
+      errors.email ||
+      errors.password ||
+      errors.confirmpassword
+
+  const signupFormError = isSignupFormEmpty
+      ? 'There are empty fields, please adjust them properly.'
+      : hasSignupErrors
+      ? 'There are incorrect fields, please adjust them properly.'
+      : ''
+
+  setErrors((prev) => ({ ...prev, signupForm: signupFormError }))
+      if (signupFormError) {
+      setSignupSuccess(false)
+      return
+  }
+
+  if (!signupFormError) {
+
+      setIsSigningUp(true)
+
+      try {
+
+        const { data: existingEmail, error: emailError } = await supabase
+            .from('users')
+            .select('email')
+            .eq('email', formData.email)
+  
+        if (existingEmail && existingEmail.length > 0) {
+            setErrors((prev) => ({
+              ...prev,
+              signupForm: "Email is unavailable. Please choose another one.",
+            }))
+            setIsSigningUp(false)
+            return
+        }
+
+        const { data: authData, error: authError } = await supabase.auth.signUp({
+          email: formData.email,
+          password: formData.password
+      })
+
+      if (authError) {
+        setErrors((prev) => ({
+            ...prev,
+            signupForm:  'An unexpected error has occurred. Please try again later.'
+        }))
+      }
+      
+      if (authData) {
+
+        setSignupSuccess("Your information has been created successfully.")
+
+        setIsSignupFormDefault(false)
+        setIsSigningUp(false)
+
+        setFormData({
+          email: '',
+          password: '',
+          confirmpassword: ''
+        })
+        
+      }
+        
+    } catch (error) {
+      setErrors((prev) => ({
+        ...prev,
+        signupForm: "An unexpected error occurred. Please try again later.",
+      }))
+      setIsSigningUp(false)
+    }
+  
+  }
+
+}
+
+const overlayStyle: React.CSSProperties = {
+  position: "fixed",
+  top: 0,
+  left: 0,
+  width: "100%",
+  height: "100%",
+  background: showSignUp ? "rgba(0, 0, 0, 0.6)" : "rgba(0, 0, 0, 0)",
+  zIndex: 500,
+  opacity: showSignUp ? 1 : 0,
+  pointerEvents: showSignUp ? "auto" : "none",
+  backdropFilter: showSignUp ? "blur(5px)" : "blur(0)",
+  overflow: showSignUp ? "clip" : "auto",
+  transition: "all 0.3s ease"
+};
+
+const signupForm: React.CSSProperties = {
+  position: "fixed",
+  top: 0,
+  left: 0,
+  width: "100%",
+  height: "100%",
+  zIndex: 600,
+  opacity: showSignUp ? 1 : 0,
+  visibility: showSignUp ? "visible" : "hidden",
+  pointerEvents: showSignUp ? "auto" : "none",
+  transition: "all 0.3s ease"
+};
+
 const handleLogin2 = () => {
   const loginUrl = "/";
   
   window.open(loginUrl, "_blank");
 };
+
+  const {
+    loading,
+    user,
+    userDetails
+  } = supabaseSession()
 
   return (
     <>
@@ -73,6 +338,8 @@ const handleLogin2 = () => {
         {/**
           * Section: Introduction
           */}
+      {!user && !userDetails ? (
+        <>
         <div className="space-y-6">
           {activeProposals && activeProposals.proposals.length > 0 ? (
             <div className="pb-6">
@@ -93,6 +360,48 @@ const handleLogin2 = () => {
               </div>
             </div>
           ) : null}
+
+        <div style={overlayStyle}></div>
+
+        <div style={signupForm}>
+
+          <div className="flex items-center justify-center min-h-screen transition-all duration-300 ease-in-out">
+
+            <form className="relative w-[320px] md:w-[420px] bg-[#dbd9d9] p-6 rounded-lg shadow-md"  onSubmit={handleSignupSubmit} noValidate>
+
+              <div className="absolute flex items-center justify-center bg-[#e85151] top-3 right-3 text-white-500 rounded-lg shadow-md hover:bg-[#bf3737] text-4xl font-light cursor-pointer w-8 h-8 transition-all duration-300 ease-in-out" onClick={hide}>&times;</div>
+              <h2 className="text-3xl mb-4 text-zinc-600 text-center">Sign Up on Waste2Earn</h2>
+
+              {errors.email && (<span><p className="text-red-700">{errors.email}</p></span>)}
+              <input type="email" name="email" 
+              value={formData.email ?? ''} onChange={(e) => handleSignupInputChange('email', e.target.value)} placeholder="Email" className="w-full font-extralight text-neutral-600 text-lg p-2 mb-4 border rounded" />
+
+              <div>
+              {errors.password && (<span><p className="text-red-700">{errors.password}</p></span>)}
+              <input id="hs-toggle-password" type="password" name="password" 
+              value={formData.password ?? ''} onChange={(e) => handleSignupInputChange('password', e.target.value)} placeholder="Password" className="w-full font-extralight text-neutral-600 text-lg p-2 mb-4 border rounded" />
+              </div>
+
+              {errors.confirmpassword && (<span><p className="text-red-700">{errors.confirmpassword}</p></span>)}
+
+              <input type="password" name="confirmpassword" 
+              value={formData.confirmpassword ?? ''} onChange={(e) => handleSignupInputChange('confirmpassword', e.target.value)} placeholder="Confirm Password" className="w-full font-extralight text-neutral-600 text-lg p-2 mb-4 border rounded" />
+
+              <div onClick={handleGoogleSignUp} className="w-full h=[40px] flex items-center justify-center bg-[#04588f] mb-4 text-white text-1xl p-2 rounded cursor-pointer hover:bg-[#003354] transition-all duration-300 ease-in-out">
+                  <img className="absolute w-6 h-6 left-10" src="https://www.svgrepo.com/show/475656/google-color.svg" loading="lazy" alt="google logo" />
+                  <span> {isGoogleSigningUp ? ('Authenticating') : ('Sign Up with Google')}</span>
+              </div>
+
+              {signupSuccess && (<span><p className="text-blue-700">{signupSuccess}</p></span>)}
+              {errors.signupForm && (<span><p className="text-red-700">{errors.signupForm}</p></span>)}
+              <button type="submit" className="w-full bg-[#067ac7] mb-4 text-white text-2xl p-2 rounded hover:bg-[#015891] transition-all duration-300 ease-in-out">{isSigningUp ? ('Signing Up') : ('Sign Up')}</button>
+            
+            </form>
+
+          </div>
+
+        </div>
+
           <h1 className="md:text-5xl text-3xl md:leading-[3.5rem] md:text-center">
           Waste Revalued
           </h1>
@@ -112,6 +421,15 @@ const handleLogin2 = () => {
                 desc={<span className="text-white text-2xl system md:block hidden">&rarr;</span>}
                 icon="/assets/icon/wasticon.svg">
                 Was2pia CoreGame 
+              </Button>
+            </div>
+            <div onClick={show}>
+              <Button
+                tertiary
+                // className="hover-walk"
+                desc={<span className="text-white text-2xl system md:block hidden">&rarr;</span>}
+                icon="/assets/icon/create.png">
+                Sign Up
               </Button>
             </div>
             <div className="md:flex md:flex-row md:space-y-0 space-y-2 md:space-x-2 items-stretch text-black">
@@ -240,6 +558,23 @@ const handleLogin2 = () => {
           <p>{`Subscribe to Waste2Earn and we'll send major Waste2Earn updates straight to your inbox.`}</p>
           <iframe src="https://waste2earn.substack.com/embed" width="100%" frameBorder="0" scrolling="no"></iframe>
         </div>
+        </>
+	):(
+		<>
+
+        <div className="space-y-2">
+            <div onClick={handleLogin}>
+              <Button
+                primary
+                desc={<span className="text-white text-2xl system md:block hidden">&rarr;</span>}
+                icon="/assets/icon/snapshot.svg">
+                Open/Create Wallet 
+              </Button>
+            </div>
+        </div>
+    
+    </>
+	)} 
       </Wrapper>
     </>
   )
