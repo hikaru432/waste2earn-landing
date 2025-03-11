@@ -308,6 +308,13 @@ const handleLogin2 = () => {
     userDetails
   } = supabaseSession()
 
+
+  if (loading) {
+    return (
+      <div><Wrapper variant="farm"><div className="flex items-center text-3xl justify-center transition-all duration-300 ease-in-out">Loading</div></Wrapper></div>
+  )
+  }
+
   return (
     <>
       <NextSeo
@@ -561,18 +568,12 @@ const handleLogin2 = () => {
         </>
 	):(
 		<>
-
-        <div className="space-y-2">
-            <div onClick={handleLogin}>
-              <Button
-                primary
-                desc={<span className="text-white text-2xl system md:block hidden">&rarr;</span>}
-                icon="/assets/icon/snapshot.svg">
-                Open/Create Wallet 
-              </Button>
-            </div>
-        </div>
-    
+      <div className="flex font-normal text-2xl bg- shadow-md rounded px-8 pt-6 mb-8"><span>Welcome, {userDetails?.email?.split('@')[0]}<br/></span>
+      <span>{userDetails?.firstname || 'No Firstname'}<br/></span>
+      <span>{userDetails?.lastname || 'No Lastname'}<br/></span>
+      <span>{userDetails?.role || 'No Role'}<br/></span>
+      <span>{new Date(userDetails?.created_at).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}</span>
+      </div>
     </>
 	)} 
       </Wrapper>
